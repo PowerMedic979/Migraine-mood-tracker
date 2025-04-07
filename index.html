@@ -1,10 +1,9 @@
-
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mood & Migraine Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,7 +12,7 @@
       max-width: 600px;
       margin: auto;
     }
-    h2 {
+    h2, h3 {
       text-align: center;
     }
     label {
@@ -33,33 +32,25 @@
       margin-top: 10px;
       border-left: 4px solid #007BFF;
     }
+    canvas {
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
-  <h2>Mood & Migraine Tracker</h2>
+  <h2>Mood & Migraine Tracker</h2><label for="date">Date:</label> <input type="date" id="date" />
 
-  <label for="date">Date:</label>
-  <input type="date" id="date" />
+<label for="mood">Mood (1-10):</label> <input type="number" id="mood" min="1" max="10" /> <small>10 = Best mood, 1 = Worst mood</small>
 
-  <label for="mood">Mood (1-10):</label>
-  <input type="number" id="mood" min="1" max="10" />
-  <small>10 = Best mood, 1 = Worst mood</small>
+<label for="migraine">Migraine Today?</label> <select id="migraine"> <option value="No">No</option> <option value="Yes">Yes</option> </select>
 
-  <label for="migraine">Migraine Today?</label>
-  <select id="migraine">
-    <option value="No">No</option>
-    <option value="Yes">Yes</option>
-  </select>
+<label for="notes">Notes (optional):</label>
 
-  <label for="notes">Notes (optional):</label>
-  <textarea id="notes" rows="3" placeholder="Sleep, food, stress, meds, etc."></textarea>
-
-  <button onclick="saveEntry()">Save Entry</button>
+  <textarea id="notes" rows="3" placeholder="Sleep, food, stress, meds, etc."></textarea><button onclick="saveEntry()">Save Entry</button>
 
   <h3>Past Entries</h3>
-  <div id="entries"></div>
-
-  <script>
+  <div id="entries"></div>  <h3>Mood Trend</h3>
+  <canvas id="moodChart" width="400" height="200"></canvas>  <script>
     document.getElementById('date').valueAsDate = new Date();
 
     function saveEntry() {
@@ -73,11 +64,12 @@
         return;
       }
 
-      const entry = { date, mood, migraine, notes };
+      const entry = { date, mood: parseInt(mood), migraine, notes };
       let entries = JSON.parse(localStorage.getItem('entries')) || [];
       entries.unshift(entry);
       localStorage.setItem('entries', JSON.stringify(entries));
       displayEntries();
+      drawChart();
 
       document.getElementById('mood').value = '';
       document.getElementById('migraine').value = 'No';
@@ -100,7 +92,57 @@
       });
     }
 
+    function drawChart() {
+      const entries = JSON.parse(localStorage.getItem('entries')) || [];
+      const sortedEntries = [...entries].reverse();
+
+      const labels = sortedEntries.map(e => e.date);
+      const moodData = sortedEntries.map(e => e.mood);
+      const migraineData = sortedEntries.map(e => e.migraine === 'Yes' ? e.mood : null);
+
+      const ctx = document.getElementById('moodChart').getContext('2d');
+      if (window.moodChart) window.moodChart.destroy();
+
+      window.moodChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Mood',
+              data: moodData,
+              borderColor: '#007BFF',
+              backgroundColor: 'rgba(0, 123, 255, 0.2)',
+              tension: 0.2,
+              fill: true,
+            },
+            {
+              label: 'Migraine Days',
+              data: migraineData,
+              borderColor: 'red',
+              backgroundColor: 'rgba(255, 0, 0, 0.3)',
+              pointRadius: 6,
+              pointStyle: 'rectRounded',
+              showLine: false
+            }
+          ]
+        },
+        options: {
+          scales: {
+            y: {
+              min: 0,
+              max: 10,
+              title: {
+                display: true,
+                text: 'Mood Score'
+              }
+            }
+          }
+        }
+      });
+    }
+
     displayEntries();
-  </script>
-</body>
+    drawChart();
+  </script></body>
 </html>
