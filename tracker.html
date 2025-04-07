@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mood & Migraine Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    h2 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, textarea, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    .entry {
+      background: #fff;
+      padding: 10px;
+      margin-top: 10px;
+      border-left: 4px solid #007BFF;
+    }
+  </style>
+</head>
+<body>
+  <h2>Mood & Migraine Tracker</h2>
+
+  <label for="date">Date:</label>
+  <input type="date" id="date" />
+
+  <label for="mood">Mood (1-10):</label>
+  <input type="number" id="mood" min="1" max="10" />
+  <small>10 = Best mood, 1 = Worst mood</small>
+
+  <label for="migraine">Migraine Today?</label>
+  <select id="migraine">
+    <option value="No">No</option>
+    <option value="Yes">Yes</option>
+  </select>
+
+  <label for="notes">Notes (optional):</label>
+  <textarea id="notes" rows="3" placeholder="Sleep, food, stress, meds, etc."></textarea>
+
+  <button onclick="saveEntry()">Save Entry</button>
+
+  <h3>Past Entries</h3>
+  <div id="entries"></div>
+
+  <script>
+    document.getElementById('date').valueAsDate = new Date();
+
+    function saveEntry() {
+      const date = document.getElementById('date').value;
+      const mood = document.getElementById('mood').value;
+      const migraine = document.getElementById('migraine').value;
+      const notes = document.getElementById('notes').value;
+
+      if (!date || !mood) {
+        alert('Please fill out the date and mood.');
+        return;
+      }
+
+      const entry = { date, mood, migraine, notes };
+      let entries = JSON.parse(localStorage.getItem('entries')) || [];
+      entries.unshift(entry);
+      localStorage.setItem('entries', JSON.stringify(entries));
+      displayEntries();
+
+      document.getElementById('mood').value = '';
+      document.getElementById('migraine').value = 'No';
+      document.getElementById('notes').value = '';
+    }
+
+    function displayEntries() {
+      const entriesDiv = document.getElementById('entries');
+      const entries = JSON.parse(localStorage.getItem('entries')) || [];
+      entriesDiv.innerHTML = '';
+      entries.forEach(entry => {
+        entriesDiv.innerHTML += `
+          <div class="entry">
+            <strong>${entry.date}</strong><br>
+            Mood: ${entry.mood}/10 <br>
+            Migraine: ${entry.migraine}<br>
+            Notes: ${entry.notes || '—'}
+          </div>
+        `;
+      });
+    }
+
+    displayEntries();
+  </script>
+</body>
+</html>
