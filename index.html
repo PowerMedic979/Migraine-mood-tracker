@@ -1,9 +1,10 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mood & Migraine Tracker</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -38,19 +39,33 @@
   </style>
 </head>
 <body>
-  <h2>Mood & Migraine Tracker</h2><label for="date">Date:</label> <input type="date" id="date" />
+  <h2>Mood & Migraine Tracker</h2>
 
-<label for="mood">Mood (1-10):</label> <input type="number" id="mood" min="1" max="10" /> <small>10 = Best mood, 1 = Worst mood</small>
+  <label for="date">Date:</label>
+  <input type="date" id="date" />
 
-<label for="migraine">Migraine Today?</label> <select id="migraine"> <option value="No">No</option> <option value="Yes">Yes</option> </select>
+  <label for="mood">Mood (1-10):</label>
+  <input type="number" id="mood" min="1" max="10" />
+  <small>10 = Best mood, 1 = Worst mood</small>
 
-<label for="notes">Notes (optional):</label>
+  <label for="migraine">Migraine Today?</label>
+  <select id="migraine">
+    <option value="No">No</option>
+    <option value="Yes">Yes</option>
+  </select>
 
-  <textarea id="notes" rows="3" placeholder="Sleep, food, stress, meds, etc."></textarea><button onclick="saveEntry()">Save Entry</button>
+  <label for="notes">Notes (optional):</label>
+  <textarea id="notes" rows="3" placeholder="Sleep, food, stress, meds, etc."></textarea>
+
+  <button onclick="saveEntry()">Save Entry</button>
 
   <h3>Past Entries</h3>
-  <div id="entries"></div>  <h3>Mood Trend</h3>
-  <canvas id="moodChart" width="400" height="200"></canvas>  <script>
+  <div id="entries"></div>
+
+  <h3>Mood Trend</h3>
+  <canvas id="moodChart" width="400" height="200"></canvas>
+
+  <script>
     document.getElementById('date').valueAsDate = new Date();
 
     function saveEntry() {
@@ -144,5 +159,6 @@
 
     displayEntries();
     drawChart();
-  </script></body>
+  </script>
+</body>
 </html>
